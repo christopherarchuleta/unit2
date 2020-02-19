@@ -29,6 +29,40 @@ function createMap(){
 
 };
 
+// Calculate minimum value within the dataset to use the Flannery ratio
+function calcMinValue(data){
+
+  // Create empty array to hold data
+  var allValues = [];
+
+  // Loop through features for each year between 2008 and 2018,
+  // incrementing by one year
+  for(var country of data.features){
+    for(var year = 2008; year <= 2018; year++){
+      // Create a variable to store all of the relevant values
+      var value = country.properties[String(year)];
+      // Fill array with relevant values
+      allValues.push(Math.abs(value));
+    }
+  }
+
+  // Use the Math.min function to calculate minimum value in the array
+  var minValue = Math.min(...allValues)
+
+  return minValue;
+}
+
+function calcPropRadius(attValue) {
+
+  // Changes the sizes of all of the symbols by changing the minimum radius
+  var minRadius = 2;
+
+  // Flannery scaling ratio
+  var radius = 1.0083 * Math.pow(attValue/minValue,0.5715) * minRadius
+
+  return radius;
+};
+
 // Add proportional symbols to the map after specifying their attributes
 function createPropSymbols(data){
 
@@ -36,12 +70,25 @@ function createPropSymbols(data){
   var attribute = "2012";
 
   var geojsonMarkerOptions = {
-    radius: 8,
-    fillColor: "#ff7800",
-    color: "#000",
-    weight: 1,
-    opacity: 1,
-    fillOpacity: 0.8
+    for(var country of data.features){
+      for(var year = 2008; year <= 2018; year++){
+        var value = country.properties[String(year)];
+        if (value <= 0) {
+          radius: 8,
+          fillColor: "#ff7800",
+          color: "#000",
+          weight: 1,
+          opacity: 1,
+          fillOpacity: 0.8
+        }
+        else {
+          radius: 8,
+          fillColor: "#1757f5",
+          color: "#000",
+          weight: 1,
+          opacity: 1,
+          fillOpacity: 0.8
+        }
   };
 
   L.geoJson(data, {
@@ -51,6 +98,8 @@ function createPropSymbols(data){
       // feature.properties is used because the attributes fall within the
       // "properties" group (see GeoJSON)
       var attValue = Number(feature.properties[attribute]);
+
+      geojsonMarkerOptions.radius = calcPropRadius(attValue);
 
       // Test the attribute value
       console.log(feature.properties, attValue);
@@ -74,9 +123,11 @@ function onEachFeature(feature, layer) {
 };
 
 // Function to retrieve data and add proportional symbols to layer in map using AJAX and jQuery
-function getData(){
+function getData(leafletMap){
   $.getJSON("data/RuralPop.geojson", function(response){
-      createPropSymbols(response);
+
+    minValue = calcMinValue(response);
+    createPropSymbols(response);
   });
 };
 
