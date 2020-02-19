@@ -10,7 +10,7 @@ function createMap(){
     zoom: 2
   });
 
-  // Add OSM tile layer
+  // Add OSM tile layer, will change basemap later
   L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>',
         id: 'mapbox/streets-v11',
