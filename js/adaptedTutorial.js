@@ -1,6 +1,6 @@
 // Mapping GeoJSON data from MegaCities.geojson
 
-// Map variable declared globally
+// Map variable declared globally.
 var map;
 
 // Instantiate map, defining the initial viewpoint
