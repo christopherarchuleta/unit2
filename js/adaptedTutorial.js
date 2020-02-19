@@ -19,17 +19,56 @@ function createMap(){
 
       // Call getData function
       getData();
+
 };
 
-// Function for retrieving GeoJSON data and placing it on the map
-// AJAX is used in "response" and jQuery is used to abridge the geoJSON retrieval code
-function getData(){
+function onEachFeature(feature, layer) {
+  var popupContent = "";
+  // Where ever there are properties in a given feature,
+  // a for loop creates popup content stating the properties
+  if (feature.properties) {
+    for (var property in feature.properties){
+      popupContent += "<p>" + property + ": " + feature.properties[property] + "</p>";
+    }
+    layer.bindPopup(popupContent);
+  };
+};
+
+// Function to retrieve data and add it to layer in map using AJAX and jQuery
+function getData(map){
   $.getJSON("data/MegaCities.geojson", function(response){
-    L.geoJson(response).addTo(map);
+
+    L.geoJson(response, {
+      onEachFeature: onEachFeature
+    }).addTo(map);
   });
-}
+};
+
+// // Function for retrieving GeoJSON data and placing it on the map
+// // AJAX is used in "response" and jQuery is used to abridge the geoJSON retrieval code
+// function getData(){
+//   $.getJSON("data/MegaCities.geojson", function(response){
+//     // pointToLayer function that converts points to layers
+//     var geojsonMarkerOptions = {
+//       radius: 8,
+//       fillColor: "#ff7800",
+//       color: "#000",
+//       weight: 1,
+//       opacity: 1,
+//       fillOpacity: 0.8
+//     };
+//
+//     // Add a GeoJSON layer to the map with circular markers
+//     L.geoJson(response, {
+//       pointToLayer: function (feature, latlng) {
+//         return L.circleMarker(latlng, geojsonMarkerOptions);
+//       }
+//     }).addTo(map);
+//   });
+// };
 
 $(document).ready(createMap);
+
 
 
 
