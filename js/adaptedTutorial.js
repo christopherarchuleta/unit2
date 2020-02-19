@@ -35,7 +35,7 @@ function onEachFeature(feature, layer) {
 };
 
 // Function to retrieve data and add it to layer in map using AJAX and jQuery
-function getData(map){
+function getData(){
   $.getJSON("data/MegaCities.geojson", function(response){
 
     L.geoJson(response, {
@@ -67,6 +67,7 @@ function getData(map){
 //   });
 // };
 
+// Call createMap function once page elements are ready
 $(document).ready(createMap);
 
 
