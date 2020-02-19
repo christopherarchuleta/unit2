@@ -1,3 +1,72 @@
+// Creating map for leaflet lab
+
+// // Map variable declared globally.
+// var map;
+//
+// // Instantiate map, defining the initial viewpoint
+// function createMap(){
+//   map = L.map('mapid', {
+//     center: [20,0],
+//     zoom: 2
+//   });
+
+  // Add OSM tile layer
+var Esri_WorldStreetMap = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
+  attribution: 'Tiles &copy; Esri &mdash; Source: Esri, DeLorme, NAVTEQ, USGS, Intermap, iPC, NRCAN, Esri Japan, METI, Esri China (Hong Kong), Esri (Thailand), TomTom, 2012',
+  accessToken: 'pk.eyJ1IjoiY2phcmNodWxldGEiLCJhIjoiY2syYW9pcTAyMWV5ejNtbzZhM25zNnpsdSJ9.7Gl9zzKB40HnoFIWBW-Tvg'
+}).addTo(leafletMap);
+
+
+  L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>',
+        id: 'mapbox/streets-v11',
+        accessToken: 'pk.eyJ1IjoiY2phcmNodWxldGEiLCJhIjoiY2syYW9pcTAyMWV5ejNtbzZhM25zNnpsdSJ9.7Gl9zzKB40HnoFIWBW-Tvg'
+      }).addTo(map);
+
+      // Call getData function
+      getData();
+
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 // Creating test div to see results via Prepros and browser inspector
 var mydiv = document.getElementById("mydiv");
 mydiv.innerHTML = "Hello World";
