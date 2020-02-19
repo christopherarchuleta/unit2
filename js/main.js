@@ -1,13 +1,20 @@
 // Creating map for leaflet lab
 
+//Step 4. Determine the attribute for scaling the proportional symbols GOOD
+//Step 5. For each feature, determine its value for the selected attribute GOOD
+//Step 6. Give each feature's circle marker a radius based on its attribute value
+
 // Map variable declared globally.
 var leafletMap;
+
+// Minimum value, used for the Flannery ratio, will be put into this global variable
+var minValue;
 
 // Instantiate map, defining the initial viewpoint
 function createMap(){
   leafletMap = L.map('mapid', {
-    center: [20,0],
-    zoom: 2
+    center: [-10,-70],
+    zoom: 3
   });
 
   // Add OSM tile layer, will change basemap later
@@ -22,6 +29,38 @@ function createMap(){
 
 };
 
+// Add proportional symbols to the map after specifying their attributes
+function createPropSymbols(data){
+
+// Hard code an attribute to create proportional symbols from
+  var attribute = "2012";
+
+  var geojsonMarkerOptions = {
+    radius: 8,
+    fillColor: "#ff7800",
+    color: "#000",
+    weight: 1,
+    opacity: 1,
+    fillOpacity: 0.8
+  };
+
+  L.geoJson(data, {
+    pointToLayer: function (feature, latlng) {
+      // Convert the attribute data type to number because data is derived from .csv
+      // Make a variable to hold the attribute values
+      // feature.properties is used because the attributes fall within the
+      // "properties" group (see GeoJSON)
+      var attValue = Number(feature.properties[attribute]);
+
+      // Test the attribute value
+      console.log(feature.properties, attValue);
+
+      // Return circle markers
+      return L.circleMarker(latlng, geojsonMarkerOptions);
+    }
+  }).addTo(leafletMap);
+};
+
 function onEachFeature(feature, layer) {
   var popupContent = "";
   // Where ever there are properties in a given feature,
@@ -34,13 +73,10 @@ function onEachFeature(feature, layer) {
   };
 };
 
-// Function to retrieve data and add it to layer in map using AJAX and jQuery
+// Function to retrieve data and add proportional symbols to layer in map using AJAX and jQuery
 function getData(){
   $.getJSON("data/RuralPop.geojson", function(response){
-
-    L.geoJson(response, {
-      onEachFeature: onEachFeature
-    }).addTo(leafletMap);
+      createPropSymbols(response);
   });
 };
 
