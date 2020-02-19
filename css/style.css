@@ -1,4 +1,10 @@
 #testdiv  {
   color: #fff328;
 }
+
+/*Set height and width of map document in 'mapid' div*/
+#mapid {
+  height: 450px;
+  width: 800px;
+}
 /*Written by Chris Archuleta, 2020*/
