@@ -70,25 +70,12 @@ function createPropSymbols(data){
   var attribute = "2012";
 
   var geojsonMarkerOptions = {
-    for(var country of data.features){
-      for(var year = 2008; year <= 2018; year++){
-        var value = country.properties[String(year)];
-        if (value <= 0) {
-          radius: 8,
-          fillColor: "#ff7800",
-          color: "#000",
-          weight: 1,
-          opacity: 1,
-          fillOpacity: 0.8
-        }
-        else {
-          radius: 8,
-          fillColor: "#1757f5",
-          color: "#000",
-          weight: 1,
-          opacity: 1,
-          fillOpacity: 0.8
-        }
+    fillColor: "#3467eb",
+    color: "#fff",
+    weight: 1,
+    opacity: 1,
+    fillOpacity: 0.8,
+    radius: 8
   };
 
   L.geoJson(data, {
@@ -99,7 +86,14 @@ function createPropSymbols(data){
       // "properties" group (see GeoJSON)
       var attValue = Number(feature.properties[attribute]);
 
-      geojsonMarkerOptions.radius = calcPropRadius(attValue);
+      if (attValue < 0){
+        geojsonMarkerOptions.fillColor = "#ebbd34"
+      } else {
+        geojsonMarkerOptions.fillColor = "#3467eb"
+      };
+
+      // Use absolute value to create symbols with negative values
+      geojsonMarkerOptions.radius = calcPropRadius(Math.abs(attValue));
 
       // Test the attribute value
       console.log(feature.properties, attValue);
