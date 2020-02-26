@@ -70,37 +70,62 @@ function createPropSymbols(data){
   var attribute = "2012";
 
   var geojsonMarkerOptions = {
-    fillColor: "#3467eb",
-    color: "#fff",
+    fillColor: "#d8b365",
+    color: "#1a1a1a",
     weight: 1,
     opacity: 1,
     fillOpacity: 0.8,
     radius: 8
   };
 
+// Create function to keep pointToLayer in L.geoJSON uncluttered
+  function pointToLayer(feature, latlng){
+    //Choose attribute to visulaize with proportional symbols
+    var attribute = "2012";
+
+    //Create marker options
+    var options = {
+        fillColor: "#ff7800",
+        color: "#000",
+        weight: 1,
+        opacity: 1,
+        fillOpacity: 0.8
+    };
+
+    // Convert the attribute data type to number because data is derived from .csv
+    // Make a variable to hold the attribute values
+    // feature.properties is used because the attributes fall within the
+    // "properties" group (see GeoJSON)
+    var attValue = Number(feature.properties[attribute]);
+
+    // Use hue to differentiate between increase and decrease in rural population
+    if (attValue < 0){
+      options.fillColor = "#d8b365"
+    } else {
+      options.fillColor = "#5ab4ac"
+    };
+
+    // Use absolute value to create symbols with negative values
+    options.radius = calcPropRadius(Math.abs(attValue));
+
+    // Test the attribute value
+    console.log(feature.properties, attValue);
+
+    //Create circle marker layer
+    var layer = L.circleMarker(latlng, options);
+
+    //Build popup content string
+    var popupContent = "<p><b>City:</b> " + feature.properties.City + "</p><p><b>" + attribute + ":</b> " + feature.properties[attribute] + "</p>";
+
+    //Bind the popup to the circle marker
+    layer.bindPopup(popupContent);
+
+    //Return the circle marker to the L.geoJson pointToLayer option
+    return layer;
+};
+
   L.geoJson(data, {
-    pointToLayer: function (feature, latlng) {
-      // Convert the attribute data type to number because data is derived from .csv
-      // Make a variable to hold the attribute values
-      // feature.properties is used because the attributes fall within the
-      // "properties" group (see GeoJSON)
-      var attValue = Number(feature.properties[attribute]);
-
-      if (attValue < 0){
-        geojsonMarkerOptions.fillColor = "#ebbd34"
-      } else {
-        geojsonMarkerOptions.fillColor = "#3467eb"
-      };
-
-      // Use absolute value to create symbols with negative values
-      geojsonMarkerOptions.radius = calcPropRadius(Math.abs(attValue));
-
-      // Test the attribute value
-      console.log(feature.properties, attValue);
-
-      // Return circle markers
-      return L.circleMarker(latlng, geojsonMarkerOptions);
-    }
+    pointToLayer: pointToLayer
   }).addTo(leafletMap);
 };
 
