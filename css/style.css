@@ -16,6 +16,11 @@
   background-color: #fff7bc;
 }
 
+.leaflet-popup-content-wrapper,
+.leaflet-popup-tip {
+  background-color: #fff7bc;
+}
+
 /*Make popup appear near symbol*/
 .leaflet-popup {
   position: absolute;
@@ -29,4 +34,44 @@
 .leaflet-container a.leaflet-popup-close-button:hover {
   color: #ff2617;
 }
+
+/*Allocate interface footprint for slider widget*/
+#map {
+    height: 400px;
+    width: 80%;
+    display: inline-block;
+}
+
+#panel {
+    width: 16%;
+    padding: 20px;
+    display: inline-block;
+    vertical-align: top;
+    text-align: center;
+    line-height: 42px;
+}
+
+.range-slider {
+  width: 100%;
+}
+
+.step {
+  width: 50%;
+  background-color: white;
+}
+
+.step img {
+  width: 100%;
+  background-color: white;
+}
+
+/*Specify increment movements*/
+#forward {
+    float: right;
+}
+
+#reverse {
+    float: left;
+}
+
 /*Written by Chris Archuleta, 2020*/

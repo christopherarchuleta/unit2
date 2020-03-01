@@ -1,8 +1,26 @@
 // Creating map for leaflet lab
 
+// Steps for retrieve operator
 //Step 4. Determine the attribute for scaling the proportional symbols GOOD
 //Step 5. For each feature, determine its value for the selected attribute GOOD
-//Step 6. Give each feature's circle marker a radius based on its attribute value
+//Step 6. Give each feature's circle marker a radius based on its attribute value GOOD
+
+// Steps for sequence operator
+//GOAL: Allow the user to sequence through the attributes and resymbolize the map
+//   according to each attribute
+//STEPS:
+//Step 1. Create slider widget GOOD
+//Step 2. Create step buttons GOOD
+//Step 3. Create an array of the sequential attributes to keep track of their order GOOD
+//Step 4. Assign the current attribute based on the index of the attributes array
+//Step 5. Listen for user input via affordances
+//Step 6. For a forward step through the sequence, increment the attributes array index;
+//   for a reverse step, decrement the attributes array index
+//Step 7. At either end of the sequence, return to the opposite end of the sequence on the next step
+//   (wrap around)
+//Step 8. Update the slider position based on the new index
+//Step 9. Reassign the current attribute based on the new attributes array index
+//Step 10. Resize proportional symbols according to each feature's value for the new attribute
 
 // Map variable declared globally.
 var leafletMap;
@@ -63,8 +81,52 @@ function calcPropRadius(attValue) {
   return radius;
 };
 
+// Build array for holding temporal data with function
+// Create attributes array for accessing data by their indices
+function processData(data){
+  var attributes = [];
+
+  // Properties of the first feature\
+  var properties = data.features[0].properties;
+
+  // Push attribute names to fill the array
+  for (var attribute in properties){
+    // Get attributes for percent change in rural population
+    // by having special prefix
+    if (attribute.indexOf("2") > -1){
+      attributes.push(attribute);
+    };
+  };
+
+  // Check result
+  console.log(attributes);
+
+  return attributes;
+};
+// Create sequence controls
+function createSequenceControls(){
+  // Create slider to extend the temporal range of the data
+  $('#panel').append('<input class="range-slider" type="range">');
+
+  // Set slider attributes such as max, min, initial value, and increments
+  $('.range-slider').attr({
+    max: 10,
+    min: 0,
+    value: 0,
+    step: 1
+  });
+
+  // Add step buttons
+  $('#panel').append('<button class="step" id="reverse">Reverse</button>');
+  $('#panel').append('<button class="step" id="forward">Forward</button>');
+  // Replace step buttons with images
+  $('#reverse').html('<img src="img/StepBackward.png">');
+  $('#forward').html('<img src="img/StepForward.png">');
+  // Step buttons created by Dmitriy Ivanov from Noun Project
+};
+
 // Add proportional symbols to the map after specifying their attributes
-function createPropSymbols(data){
+function createPropSymbols(data, attributes){
 
 // Hard code an attribute to create proportional symbols from
   var attribute = "2012";
@@ -79,9 +141,11 @@ function createPropSymbols(data){
   };
 
 // Create function to keep pointToLayer in L.geoJSON uncluttered
-  function pointToLayer(feature, latlng){
+  function pointToLayer(feature, latlng, attributes){
     //Choose attribute to visulaize with proportional symbols
-    var attribute = "2012";
+    // Choose intial value for map and slider
+    var attribute = attributes[0];
+    console.log(attribute);
 
     //Create marker options
     var options = {
@@ -131,7 +195,10 @@ function createPropSymbols(data){
 };
 
   L.geoJson(data, {
-    pointToLayer: pointToLayer
+    pointToLayer: function(feature, latlng){
+      // Add attributes to their respective proportional symbols
+      return pointToLayer(feature, latlng, attributes);
+    }
   }).addTo(leafletMap);
 };
 
@@ -152,7 +219,12 @@ function getData(leafletMap){
   $.getJSON("data/RuralPop.geojson", function(response){
 
     minValue = calcMinValue(response);
-    createPropSymbols(response);
+    // Create attributes array for accessing data by their indices
+    var attributes = processData(response);
+
+    // Add symbols and UI elements
+    createPropSymbols(response, attributes);
+    createSequenceControls(attributes);
   });
 };
 
