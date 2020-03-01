@@ -21,7 +21,7 @@
   position: absolute;
 }
 
-/*Change color of close button*/
+/*Change color of close button and hover color*/
 .leaflet-container a.leaflet-popup-close-button {
   color: #b8564f;
 }
