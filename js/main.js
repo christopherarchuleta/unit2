@@ -114,11 +114,17 @@ function createPropSymbols(data){
     //Create circle marker layer
     var layer = L.circleMarker(latlng, options);
 
-    //Build popup content string
-    var popupContent = "<p><b>City:</b> " + feature.properties.City + "</p><p><b>" + attribute + ":</b> " + feature.properties[attribute] + "</p>";
+    //Build popup content string with country name
+    var popupContent = "<p><b>Country:</b> " + feature.properties[String("Country Name")] + "</p>";
 
-    //Bind the popup to the circle marker
-    layer.bindPopup(popupContent);
+    // Add context to the popup
+    var percentChange = attribute.split("_")[1];
+    popupContent += "<p><b>Rural Pop. Change in " + attribute + ":<b> " + feature.properties[attribute] + " %</p>";
+
+    //Bind the popup to the circle marker and create an offset
+    layer.bindPopup(popupContent, {
+      offset: new L.Point(0,-options.radius * 0.5)
+    });
 
     //Return the circle marker to the L.geoJson pointToLayer option
     return layer;

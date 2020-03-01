@@ -7,4 +7,26 @@
   height: 450px;
   width: 800px;
 }
+
+/*Change popup content for proportional symbol map*/
+/*Decrease margins and line height for a tighter popup*/
+.leaflet-popup-content {
+  margin: 5px 10px;
+  line-height: 0.7;
+  background-color: #fff7bc;
+}
+
+/*Make popup appear at clicking point*/
+.leaflet-popup {
+  position: absolute;
+}
+
+/*Change color of close button*/
+.leaflet-container a.leaflet-popup-close-button {
+  color: #b8564f;
+}
+
+.leaflet-container a.leaflet-popup-close-button:hover {
+  color: #ff2617;
+}
 /*Written by Chris Archuleta, 2020*/
