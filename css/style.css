@@ -16,7 +16,7 @@
   background-color: #fff7bc;
 }
 
-/*Make popup appear at clicking point*/
+/*Make popup appear near symbol*/
 .leaflet-popup {
   position: absolute;
 }
