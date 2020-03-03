@@ -12,8 +12,8 @@
 //Step 1. Create slider widget GOOD
 //Step 2. Create step buttons GOOD
 //Step 3. Create an array of the sequential attributes to keep track of their order GOOD
-//Step 4. Assign the current attribute based on the index of the attributes array
-//Step 5. Listen for user input via affordances
+//Step 4. Assign the current attribute based on the index of the attributes array GOOD
+//Step 5. Listen for user input via affordances GOOD
 //Step 6. For a forward step through the sequence, increment the attributes array index;
 //   for a reverse step, decrement the attributes array index
 //Step 7. At either end of the sequence, return to the opposite end of the sequence on the next step
@@ -46,6 +46,7 @@ function createMap(){
       getData();
 
 };
+
 
 // Calculate minimum value within the dataset to use the Flannery ratio
 function calcMinValue(data){
@@ -81,6 +82,7 @@ function calcPropRadius(attValue) {
   return radius;
 };
 
+
 // Build array for holding temporal data with function
 // Create attributes array for accessing data by their indices
 function processData(data){
@@ -99,15 +101,41 @@ function processData(data){
   };
 
   // Check result
-  console.log(attributes);
+  console.log(attributes[9]);
 
   return attributes;
 };
+
+function updatePropSymbols(attribute){
+  leafletMap.eachLayer(function(layer){
+    if (layer.feature && layer.feature.properties[attribute]){
+      var props = layer.feature.properties;
+      //update each feature's radius based on new attribute values
+      var radius = calcPropRadius(props[attribute]);
+      layer.setRadius(radius);
+      console.log(attribute);
+      console.log(radius);
+
+
+      //add city to popup content string
+      var popupContent = "<p><b>Country:</b> " + props[String("Country Name")] + "</p>";
+
+      //add formatted attribute to panel content string
+      var percentChange = attribute.split("_")[1];
+      popupContent += "<p><b>Rural Pop. Change in " + percentChange + ":<b> " + feature.properties[attribute] + " %</p>";
+
+      //update popup content
+      popup = layer.getPopup();
+      popup.setContent(popupContent).update();
+      };
+    });
+};
+
 // Create sequence controls
 function createSequenceControls(){
   // Create slider to extend the temporal range of the data
   $('#panel').append('<input class="range-slider" type="range">');
-
+  console.log(attributes);
   // Set slider attributes such as max, min, initial value, and increments
   $('.range-slider').attr({
     max: 10,
@@ -115,6 +143,63 @@ function createSequenceControls(){
     value: 0,
     step: 1
   });
+
+  // function updatePropSymbols(attribute){
+  //   leafletMap.eachLayer(function(layer){
+  //     if (layer.feature && layer.feature.properties[attribute]){
+  //       var props = layer.feature.properties;
+  //       //update each feature's radius based on new attribute values
+  //       var radius = calcPropRadius(props[attribute]);
+  //       layer.setRadius(radius);
+  //       console.log(attribute);
+  //       console.log(radius);
+  //
+  //
+  //       //add city to popup content string
+  //       var popupContent = "<p><b>Country:</b> " + props[String("Country Name")] + "</p>";
+  //
+  //       //add formatted attribute to panel content string
+  //       var percentChange = attribute.split("_")[1];
+  //       popupContent += "<p><b>Rural Pop. Change in " + percentChange + ":<b> " + feature.properties[attribute] + " %</p>";
+  //
+  //       //update popup content
+  //       popup = layer.getPopup();
+  //       popup.setContent(popupContent).update();
+  //       };
+  //     });
+  // };
+
+  $('.step').click(function(){
+    // Records previous slider value
+    var index = $('range-slider').val();
+    // Conditional statement for when forward button is pressed
+    if($(this).attr('id') == 'forward'){
+      // Increment
+      index++;
+      // Make value go around if an end is surpassed
+      index = index > 10 ? 0 : index;
+      // Conditional statemnt for when reverse button is pressed
+    } else if ($(this).attr('id') == 'reverse'){
+      // Decrement
+      index--;
+      index = index < 0 ? 10 : index;
+      // Make proportional symbols reflect
+      // the current value from the attributes array
+      updatePropSymbols(attributes[index]);
+    };
+
+    // Make range slider value equal the new index value
+    $('range-slider').val(index);
+  });
+
+// Event listener for the range slider,
+// which keeps track of the value of the slider and reassigns it
+  $('.range-slider').on('input', function(){
+    var index = $(this).val();
+    console.log(attributes[index]);
+    updatePropSymbols(attributes[index]);
+  });
+
 
   // Add step buttons
   $('#panel').append('<button class="step" id="reverse">Reverse</button>');
@@ -182,7 +267,7 @@ function createPropSymbols(data, attributes){
     var popupContent = "<p><b>Country:</b> " + feature.properties[String("Country Name")] + "</p>";
 
     // Add context to the popup
-    var percentChange = attribute.split("_")[1];
+    // var percentChange = attribute.split("_")[1];
     popupContent += "<p><b>Rural Pop. Change in " + attribute + ":<b> " + feature.properties[attribute] + " %</p>";
 
     //Bind the popup to the circle marker and create an offset
