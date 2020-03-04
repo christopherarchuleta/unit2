@@ -15,15 +15,18 @@
 //Step 4. Assign the current attribute based on the index of the attributes array GOOD
 //Step 5. Listen for user input via affordances GOOD
 //Step 6. For a forward step through the sequence, increment the attributes array index;
-//   for a reverse step, decrement the attributes array index
+//   for a reverse step, decrement the attributes array index GOOD
 //Step 7. At either end of the sequence, return to the opposite end of the sequence on the next step
-//   (wrap around)
-//Step 8. Update the slider position based on the new index
+//   (wrap around) GOOD
+//Step 8. Update the slider position based on the new index GOOD
 //Step 9. Reassign the current attribute based on the new attributes array index
 //Step 10. Resize proportional symbols according to each feature's value for the new attribute
 
 // Map variable declared globally.
 var leafletMap;
+
+// Define variable globally to hold data
+// var attributes = [];
 
 // Minimum value, used for the Flannery ratio, will be put into this global variable
 var minValue;
@@ -69,7 +72,7 @@ function calcMinValue(data){
   var minValue = Math.min(...allValues)
 
   return minValue;
-}
+};
 
 function calcPropRadius(attValue) {
 
@@ -88,7 +91,7 @@ function calcPropRadius(attValue) {
 function processData(data){
   var attributes = [];
 
-  // Properties of the first feature\
+  // Properties of the first feature
   var properties = data.features[0].properties;
 
   // Push attribute names to fill the array
@@ -102,6 +105,7 @@ function processData(data){
 
   // Check result
   console.log(attributes[9]);
+  console.log(attributes);
 
   return attributes;
 };
@@ -135,7 +139,7 @@ function updatePropSymbols(attribute){
 function createSequenceControls(){
   // Create slider to extend the temporal range of the data
   $('#panel').append('<input class="range-slider" type="range">');
-  console.log(attributes);
+  // console.log(attributes);
   // Set slider attributes such as max, min, initial value, and increments
   $('.range-slider').attr({
     max: 10,
@@ -144,36 +148,13 @@ function createSequenceControls(){
     step: 1
   });
 
-  // function updatePropSymbols(attribute){
-  //   leafletMap.eachLayer(function(layer){
-  //     if (layer.feature && layer.feature.properties[attribute]){
-  //       var props = layer.feature.properties;
-  //       //update each feature's radius based on new attribute values
-  //       var radius = calcPropRadius(props[attribute]);
-  //       layer.setRadius(radius);
-  //       console.log(attribute);
-  //       console.log(radius);
-  //
-  //
-  //       //add city to popup content string
-  //       var popupContent = "<p><b>Country:</b> " + props[String("Country Name")] + "</p>";
-  //
-  //       //add formatted attribute to panel content string
-  //       var percentChange = attribute.split("_")[1];
-  //       popupContent += "<p><b>Rural Pop. Change in " + percentChange + ":<b> " + feature.properties[attribute] + " %</p>";
-  //
-  //       //update popup content
-  //       popup = layer.getPopup();
-  //       popup.setContent(popupContent).update();
-  //       };
-  //     });
-  // };
 
   $('.step').click(function(){
     // Records previous slider value
-    var index = $('range-slider').val();
+    var index = $('.range-slider').val();
+    console.log(index);
     // Conditional statement for when forward button is pressed
-    if($(this).attr('id') == 'forward'){
+    if ($(this).attr('id') == 'forward'){
       // Increment
       index++;
       // Make value go around if an end is surpassed
@@ -185,6 +166,9 @@ function createSequenceControls(){
       index = index < 0 ? 10 : index;
       // Make proportional symbols reflect
       // the current value from the attributes array
+      console.log(index);
+      console.log(attributes);
+      console.log(attributes[index]);
       updatePropSymbols(attributes[index]);
     };
 
@@ -196,6 +180,8 @@ function createSequenceControls(){
 // which keeps track of the value of the slider and reassigns it
   $('.range-slider').on('input', function(){
     var index = $(this).val();
+    console.log(index);
+    console.log(attributes);
     console.log(attributes[index]);
     updatePropSymbols(attributes[index]);
   });
@@ -300,17 +286,36 @@ function onEachFeature(feature, layer) {
 };
 
 // Function to retrieve data and add proportional symbols to layer in map using AJAX and jQuery
+// function getData(leafletMap){
+//   $.getJSON("data/RuralPop.geojson", function(response){
+//
+//     // Create attributes array for accessing data by their indices
+//     var attributes = processData(response);
+//     console.log(attributes);
+//
+//     minValue = calcMinValue(response);
+//
+//     // Add symbols and UI elements
+//     createPropSymbols(response, attributes);
+//     // createSequenceControls(attributes);
+//     createSequenceControls(attributes);
+//
+//   });
+// };
+
 function getData(leafletMap){
-  $.getJSON("data/RuralPop.geojson", function(response){
+    //load the data
+    $.ajax("data/RuralPop.geojson", {
+        dataType: "json",
+        success: function(response){
+            var attributes = processData(response);
+            minValue = calcMinValue(response);
+            //add symbols and UI elements
+            createPropSymbols(response, attributes);
+            createSequenceControls(attributes);
 
-    minValue = calcMinValue(response);
-    // Create attributes array for accessing data by their indices
-    var attributes = processData(response);
-
-    // Add symbols and UI elements
-    createPropSymbols(response, attributes);
-    createSequenceControls(attributes);
-  });
+        }
+    });
 };
 
 // Call createMap function once page elements are ready
