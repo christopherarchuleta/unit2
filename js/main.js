@@ -26,7 +26,7 @@
 var leafletMap;
 
 // Define variable globally to hold data
-// var attributes = [];
+var attributes = ["2008","2009","2010","2011","2012","2013","2014","2015","2016","2017","2018"];
 
 // Minimum value, used for the Flannery ratio, will be put into this global variable
 var minValue;
@@ -126,7 +126,7 @@ function updatePropSymbols(attribute){
 
       //add formatted attribute to panel content string
       var percentChange = attribute.split("_")[1];
-      popupContent += "<p><b>Rural Pop. Change in " + percentChange + ":<b> " + feature.properties[attribute] + " %</p>";
+      popupContent += "<p><b>Rural Pop. Change in " + attribute + ":<b> " + props[attribute] + " %</p>";
 
       //update popup content
       popup = layer.getPopup();
@@ -176,12 +176,11 @@ function createSequenceControls(){
       index = index < 0 ? 10 : index;
       // // Make proportional symbols reflect
       // // the current value from the attributes array
-      // updatePropSymbols(attributes[index]);
+      updatePropSymbols(attributes[index]);
     };
 
     // Make proportional symbols reflect
     // the current value from the attributes array
-    // updatePropSymbols(attributes[index]);
 
     // Make range slider value equal the new index value
     $('.range-slider').val(index);
