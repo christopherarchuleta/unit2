@@ -115,11 +115,13 @@ function updatePropSymbols(attribute){
     if (layer.feature && layer.feature.properties[attribute]){
       var props = layer.feature.properties;
       //update each feature's radius based on new attribute values
-      var radius = calcPropRadius(props[attribute]);
+      var radius = calcPropRadius(Math.abs(props[attribute]));
+
+
 
       layer.setRadius(radius);
       console.log(attribute);
-      console.log(props[String("Country Name")] + typeof(radius) + radius);
+      console.log(props[String("Country Name")] + attribute + typeof(radius) + radius);
 
 
       //add city to popup content string
