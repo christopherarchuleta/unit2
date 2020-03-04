@@ -116,9 +116,10 @@ function updatePropSymbols(attribute){
       var props = layer.feature.properties;
       //update each feature's radius based on new attribute values
       var radius = calcPropRadius(props[attribute]);
+
       layer.setRadius(radius);
       console.log(attribute);
-      console.log(radius);
+      console.log(props[String("Country Name")] + typeof(radius) + radius);
 
 
       //add city to popup content string
@@ -169,6 +170,7 @@ function createSequenceControls(){
       index++;
       // Make value go around if an end is surpassed
       index = index > 10 ? 0 : index;
+      updatePropSymbols(attributes[index]);
       // Conditional statemnt for when reverse button is pressed
     } else if ($(this).attr('id') == 'reverse'){
       // Decrement
@@ -201,7 +203,7 @@ function createSequenceControls(){
 function createPropSymbols(data, attributes){
 
 // Hard code an attribute to create proportional symbols from
-  var attribute = "2012";
+  // var attribute = "2012";
 
   var geojsonMarkerOptions = {
     fillColor: "#d8b365",
