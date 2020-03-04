@@ -39,11 +39,11 @@ function createMap(){
   });
 
   // Add OSM tile layer, will change basemap later
-  L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>',
-        id: 'mapbox/streets-v11',
-        accessToken: 'pk.eyJ1IjoiY2phcmNodWxldGEiLCJhIjoiY2syYW9pcTAyMWV5ejNtbzZhM25zNnpsdSJ9.7Gl9zzKB40HnoFIWBW-Tvg'
-      }).addTo(leafletMap);
+  L.tileLayer('https://api.mapbox.com/styles/v1/cjarchuleta/ck7cvqmln0kc41jmlm4ngou7n/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1IjoiY2phcmNodWxldGEiLCJhIjoiY2syYW9pcTAyMWV5ejNtbzZhM25zNnpsdSJ9.7Gl9zzKB40HnoFIWBW-Tvg'
+        // attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>',
+        // id: 'mapbox/streets-v11',
+        // accessToken: 'pk.eyJ1IjoiY2phcmNodWxldGEiLCJhIjoiY2syYW9pcTAyMWV5ejNtbzZhM25zNnpsdSJ9.7Gl9zzKB40HnoFIWBW-Tvg'
+      ).addTo(leafletMap);
 
       // Call getData function
       getData();
@@ -77,7 +77,7 @@ function calcMinValue(data){
 function calcPropRadius(attValue) {
 
   // Changes the sizes of all of the symbols by changing the minimum radius
-  var minRadius = 2;
+  var minRadius = 1.3;
 
   // Flannery scaling ratio
   var radius = 1.0083 * Math.pow(attValue/minValue,0.5715) * minRadius
@@ -117,6 +117,14 @@ function updatePropSymbols(attribute){
       //update each feature's radius based on new attribute values
       var radius = calcPropRadius(Math.abs(props[attribute]));
 
+      if (props[attribute] < 0){
+        layer.setStyle({fillColor:"#d8b365"});
+        console.log(props[attribute]);
+      }
+      else {
+        layer.setStyle({fillColor:"#5ab4ac"});
+        console.log(props[attribute]);
+      };
 
 
       layer.setRadius(radius);
@@ -129,7 +137,7 @@ function updatePropSymbols(attribute){
 
       //add formatted attribute to panel content string
       var percentChange = attribute.split("_")[1];
-      popupContent += "<p><b>Rural Pop. Change in " + attribute + ":<b> " + props[attribute] + " %</p>";
+      popupContent += "<p><b>Rural Pop. Growth in " + attribute + ":<b> " + props[attribute] + " %</p>";
 
       //update popup content
       popup = layer.getPopup();
@@ -204,17 +212,6 @@ function createSequenceControls(){
 // Add proportional symbols to the map after specifying their attributes
 function createPropSymbols(data, attributes){
 
-// Hard code an attribute to create proportional symbols from
-  // var attribute = "2012";
-
-  var geojsonMarkerOptions = {
-    fillColor: "#d8b365",
-    color: "#1a1a1a",
-    weight: 1,
-    opacity: 1,
-    fillOpacity: 0.8,
-    radius: 8
-  };
 
 // Create function to keep pointToLayer in L.geoJSON uncluttered
   function pointToLayer(feature, latlng, attributes){
