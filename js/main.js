@@ -139,6 +139,16 @@ function updatePropSymbols(attribute){
 function createSequenceControls(){
   // Create slider to extend the temporal range of the data
   $('#panel').append('<input class="range-slider" type="range">');
+
+  // Add step buttons
+  $('#panel').append('<button class="step" id="reverse">Reverse</button>');
+  $('#panel').append('<button class="step" id="forward">Forward</button>');
+  // Replace step buttons with images
+  $('#reverse').html('<img src="img/StepBackward.png">');
+  $('#forward').html('<img src="img/StepForward.png">');
+  // Step buttons created by Dmitriy Ivanov from Noun Project
+
+
   // console.log(attributes);
   // Set slider attributes such as max, min, initial value, and increments
   $('.range-slider').attr({
@@ -164,16 +174,17 @@ function createSequenceControls(){
       // Decrement
       index--;
       index = index < 0 ? 10 : index;
-      // Make proportional symbols reflect
-      // the current value from the attributes array
-      console.log(index);
-      console.log(attributes);
-      console.log(attributes[index]);
-      updatePropSymbols(attributes[index]);
+      // // Make proportional symbols reflect
+      // // the current value from the attributes array
+      // updatePropSymbols(attributes[index]);
     };
 
+    // Make proportional symbols reflect
+    // the current value from the attributes array
+    // updatePropSymbols(attributes[index]);
+
     // Make range slider value equal the new index value
-    $('range-slider').val(index);
+    $('.range-slider').val(index);
   });
 
 // Event listener for the range slider,
@@ -185,15 +196,6 @@ function createSequenceControls(){
     console.log(attributes[index]);
     updatePropSymbols(attributes[index]);
   });
-
-
-  // Add step buttons
-  $('#panel').append('<button class="step" id="reverse">Reverse</button>');
-  $('#panel').append('<button class="step" id="forward">Forward</button>');
-  // Replace step buttons with images
-  $('#reverse').html('<img src="img/StepBackward.png">');
-  $('#forward').html('<img src="img/StepForward.png">');
-  // Step buttons created by Dmitriy Ivanov from Noun Project
 };
 
 // Add proportional symbols to the map after specifying their attributes
