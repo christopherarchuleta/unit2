@@ -35,8 +35,11 @@ var minValue;
 function createMap(){
   leafletMap = L.map('mapid', {
     center: [-10,-70],
-    zoom: 3
+    zoom: 3,
   });
+
+  // Set maximum zoom to maintain national scale
+  leafletMap.options.maxZoom = 7;
 
   // Add OSM tile layer, will change basemap later
   L.tileLayer('https://api.mapbox.com/styles/v1/cjarchuleta/ck7cvqmln0kc41jmlm4ngou7n/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1IjoiY2phcmNodWxldGEiLCJhIjoiY2syYW9pcTAyMWV5ejNtbzZhM25zNnpsdSJ9.7Gl9zzKB40HnoFIWBW-Tvg'
@@ -86,6 +89,29 @@ function calcPropRadius(attValue) {
 };
 
 
+// function SymbolColors(properties, attribute){
+//   this.properties = properties;
+//   this.attribute = attribute;
+//   if (properties[attribute] < 0){
+//     layer.setStyle({fillColor:"#d8b365"});
+//   } else {
+//     layer.setStyle({fillColor:"5ab4ac"});
+//   };
+// };
+
+
+// Refactor redundant code in pointToLayer and updatePropSymbols by making one function
+function createPopupContent(properties, attribute){
+  // Add country name to popup
+  var popupContent = "<p><b>Country:</b> " + properties[String("Country Name")] + "</p>";
+
+  // Add rural population growth to popup
+  var year = attribute.split("_")[1];
+  popupContent += "<p><b>Rural Pop. Growth in " + attribute + ":<b> " + properties[attribute] + "%</p>";
+
+  return popupContent;
+};
+
 // Build array for holding temporal data with function
 // Create attributes array for accessing data by their indices
 function processData(data){
@@ -112,18 +138,20 @@ function processData(data){
 
 function updatePropSymbols(attribute){
   leafletMap.eachLayer(function(layer){
+    // Only execute following code on the percent change in rural population
     if (layer.feature && layer.feature.properties[attribute]){
       var props = layer.feature.properties;
       //update each feature's radius based on new attribute values
       var radius = calcPropRadius(Math.abs(props[attribute]));
 
+      // var symColors = new SymbolColors(props, attribute);
+
+      // Set colors of the proportional symbols based on positive or negative growth
       if (props[attribute] < 0){
         layer.setStyle({fillColor:"#d8b365"});
-        console.log(props[attribute]);
       }
       else {
         layer.setStyle({fillColor:"#5ab4ac"});
-        console.log(props[attribute]);
       };
 
 
@@ -131,13 +159,9 @@ function updatePropSymbols(attribute){
       console.log(attribute);
       console.log(props[String("Country Name")] + attribute + typeof(radius) + radius);
 
+      // Use consolidated popup content code
+      var popupContent = createPopupContent(props, attribute);
 
-      //add city to popup content string
-      var popupContent = "<p><b>Country:</b> " + props[String("Country Name")] + "</p>";
-
-      //add formatted attribute to panel content string
-      var percentChange = attribute.split("_")[1];
-      popupContent += "<p><b>Rural Pop. Growth in " + attribute + ":<b> " + props[attribute] + " %</p>";
 
       //update popup content
       popup = layer.getPopup();
@@ -235,6 +259,9 @@ function createPropSymbols(data, attributes){
     // "properties" group (see GeoJSON)
     var attValue = Number(feature.properties[attribute]);
 
+
+    // symColors = SymbolColors(Number(feature.properties),attribute);
+
     // Use hue to differentiate between increase and decrease in rural population
     if (attValue < 0){
       options.fillColor = "#d8b365"
@@ -251,12 +278,8 @@ function createPropSymbols(data, attributes){
     //Create circle marker layer
     var layer = L.circleMarker(latlng, options);
 
-    //Build popup content string with country name
-    var popupContent = "<p><b>Country:</b> " + feature.properties[String("Country Name")] + "</p>";
-
-    // Add context to the popup
-    // var percentChange = attribute.split("_")[1];
-    popupContent += "<p><b>Rural Pop. Change in " + attribute + ":<b> " + feature.properties[attribute] + " %</p>";
+    // Create popup content with consolidated code
+    var popupContent = createPopupContent (feature.properties, attribute);
 
     //Bind the popup to the circle marker and create an offset
     layer.bindPopup(popupContent, {
@@ -287,24 +310,7 @@ function onEachFeature(feature, layer) {
   };
 };
 
-// Function to retrieve data and add proportional symbols to layer in map using AJAX and jQuery
-// function getData(leafletMap){
-//   $.getJSON("data/RuralPop.geojson", function(response){
-//
-//     // Create attributes array for accessing data by their indices
-//     var attributes = processData(response);
-//     console.log(attributes);
-//
-//     minValue = calcMinValue(response);
-//
-//     // Add symbols and UI elements
-//     createPropSymbols(response, attributes);
-//     // createSequenceControls(attributes);
-//     createSequenceControls(attributes);
-//
-//   });
-// };
-
+// Use AJAX for asynchronous data and page loading
 function getData(leafletMap){
     //load the data
     $.ajax("data/RuralPop.geojson", {
