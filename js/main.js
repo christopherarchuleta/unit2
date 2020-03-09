@@ -89,15 +89,15 @@ function calcPropRadius(attValue) {
 };
 
 
-// function SymbolColors(properties, attribute){
-//   this.properties = properties;
-//   this.attribute = attribute;
-//   if (properties[attribute] < 0){
-//     layer.setStyle({fillColor:"#d8b365"});
-//   } else {
-//     layer.setStyle({fillColor:"5ab4ac"});
-//   };
-// };
+function SymbolColors(properties, attribute){
+  this.properties = properties;
+  this.attribute = attribute;
+  if (properties[attribute] < 0){
+    return layer.setStyle({fillColor:"#d8b365"});
+  } else {
+    return layer.setStyle({fillColor:"5ab4ac"});
+  };
+};
 
 
 // Refactor redundant code in pointToLayer and updatePropSymbols by making one function
@@ -170,17 +170,52 @@ function updatePropSymbols(attribute){
     });
 };
 
+
+function createSequenceControls(attributes){
+  var sequenceControl = L.Control.extend({
+    options: {
+      position: 'bottom left'
+    },
+
+    onAdd: function() {
+      var container = L.DomUtil.create('div', 'sequence-control-container');
+
+      $(container).append('<input class="range-slider" type="range">');
+
+      // Add step buttons
+      $(container).append('<button class="step" id="reverse">Reverse</button>');
+      $(container).append('<button class="step" id="forward">Forward</button>');
+      // Replace step buttons with images
+      $('#reverse').html('<img src="img/StepBackward.png">');
+      $('#forward').html('<img src="img/StepForward.png">');
+      // Step buttons created by Dmitriy Ivanov from Noun Project
+
+    }
+  })
+
+  // Above code creates sequence controls. Add options below here
+
+
+
+
+
+
+
+
+}
+
+
 // Create sequence controls
-function createSequenceControls(){
+// function createSequenceControls(){
   // Create slider to extend the temporal range of the data
-  $('#panel').append('<input class="range-slider" type="range">');
+  // $('#panel').append('<input class="range-slider" type="range">');
 
   // Add step buttons
-  $('#panel').append('<button class="step" id="reverse">Reverse</button>');
-  $('#panel').append('<button class="step" id="forward">Forward</button>');
+  // $('#panel').append('<button class="step" id="reverse">Reverse</button>');
+  // $('#panel').append('<button class="step" id="forward">Forward</button>');
   // Replace step buttons with images
-  $('#reverse').html('<img src="img/StepBackward.png">');
-  $('#forward').html('<img src="img/StepForward.png">');
+  // $('#reverse').html('<img src="img/StepBackward.png">');
+  // $('#forward').html('<img src="img/StepForward.png">');
   // Step buttons created by Dmitriy Ivanov from Noun Project
 
 
@@ -263,11 +298,11 @@ function createPropSymbols(data, attributes){
     // symColors = SymbolColors(Number(feature.properties),attribute);
 
     // Use hue to differentiate between increase and decrease in rural population
-    if (attValue < 0){
-      options.fillColor = "#d8b365"
-    } else {
-      options.fillColor = "#5ab4ac"
-    };
+    // if (attValue < 0){
+    //   options.fillColor = "#d8b365"
+    // } else {
+    //   options.fillColor = "#5ab4ac"
+    // };
 
     // Use absolute value to create symbols with negative values
     options.radius = calcPropRadius(Math.abs(attValue));
@@ -280,6 +315,8 @@ function createPropSymbols(data, attributes){
 
     // Create popup content with consolidated code
     var popupContent = createPopupContent (feature.properties, attribute);
+
+    return SymbolColors(layer, properties, attribute);
 
     //Bind the popup to the circle marker and create an offset
     layer.bindPopup(popupContent, {
@@ -307,6 +344,9 @@ function onEachFeature(feature, layer) {
       popupContent += "<p>" + property + ": " + feature.properties[property] + "</p>";
     }
     layer.bindPopup(popupContent);
+
+
+
   };
 };
 
