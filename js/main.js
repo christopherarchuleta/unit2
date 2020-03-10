@@ -89,15 +89,15 @@ function calcPropRadius(attValue) {
 };
 
 
-function SymbolColors(properties, attribute){
-  this.properties = properties;
-  this.attribute = attribute;
-  if (properties[attribute] < 0){
-    return layer.setStyle({fillColor:"#d8b365"});
-  } else {
-    return layer.setStyle({fillColor:"5ab4ac"});
-  };
-};
+// function SymbolColors(properties, attribute){
+//   this.properties = properties;
+//   this.attribute = attribute;
+//   if (properties[attribute] < 0){
+//     layer.setStyle({fillColor:"#d8b365"});
+//   } else {
+//     layer.setStyle({fillColor:"5ab4ac"});
+//   };
+// };
 
 
 // Refactor redundant code in pointToLayer and updatePropSymbols by making one function
@@ -129,10 +129,6 @@ function processData(data){
     };
   };
 
-  // Check result
-  console.log(attributes[9]);
-  console.log(attributes);
-
   return attributes;
 };
 
@@ -163,64 +159,68 @@ function updatePropSymbols(attribute){
       var popupContent = createPopupContent(props, attribute);
 
 
+      function createLegend(attributes){
+        var LegendControl = L.Control.extend({
+          options: {
+            position: 'bottomright'
+          },
+
+          onAdd: function () {
+            var container = L.DomUtil.create('div', 'legend-control-container');
+
+            $(container).append('<button id="legend">Rural</button>');
+
+            return container;
+          }
+        });
+
+        leafletMap.addControl(new LegendControl());
+
+
+      };
+
+
       //update popup content
       popup = layer.getPopup();
       popup.setContent(popupContent).update();
+      createLegend(attributes).update();
       };
     });
 };
 
-
+// Create sequence controls using the L.control class
 function createSequenceControls(attributes){
-  var sequenceControl = L.Control.extend({
+  var SequenceControl = L.Control.extend({
     options: {
-      position: 'bottom left'
+      position: 'bottomleft'
     },
 
     onAdd: function() {
+      // setting a variable for the control container
       var container = L.DomUtil.create('div', 'sequence-control-container');
 
+      // Add slider bar
       $(container).append('<input class="range-slider" type="range">');
 
       // Add step buttons
-      $(container).append('<button class="step" id="reverse">Reverse</button>');
+      $(container).append('<button class="step" id="reverse">Backward</button>');
       $(container).append('<button class="step" id="forward">Forward</button>');
       // Replace step buttons with images
       $('#reverse').html('<img src="img/StepBackward.png">');
       $('#forward').html('<img src="img/StepForward.png">');
       // Step buttons created by Dmitriy Ivanov from Noun Project
 
+      // Disable mouse event listeners within container so that clicks
+      // only affect sequnce controls
+      L.DomEvent.disableClickPropagation(container);
+
+      // Display the sequence control
+      return container;
     }
-  })
+  });
 
-  // Above code creates sequence controls. Add options below here
+  leafletMap.addControl(new SequenceControl());
 
-
-
-
-
-
-
-
-}
-
-
-// Create sequence controls
-// function createSequenceControls(){
-  // Create slider to extend the temporal range of the data
-  // $('#panel').append('<input class="range-slider" type="range">');
-
-  // Add step buttons
-  // $('#panel').append('<button class="step" id="reverse">Reverse</button>');
-  // $('#panel').append('<button class="step" id="forward">Forward</button>');
-  // Replace step buttons with images
-  // $('#reverse').html('<img src="img/StepBackward.png">');
-  // $('#forward').html('<img src="img/StepForward.png">');
-  // Step buttons created by Dmitriy Ivanov from Noun Project
-
-
-  // console.log(attributes);
-  // Set slider attributes such as max, min, initial value, and increments
   $('.range-slider').attr({
     max: 10,
     min: 0,
@@ -228,11 +228,9 @@ function createSequenceControls(attributes){
     step: 1
   });
 
-
   $('.step').click(function(){
     // Records previous slider value
     var index = $('.range-slider').val();
-    console.log(index);
     // Conditional statement for when forward button is pressed
     if ($(this).attr('id') == 'forward'){
       // Increment
@@ -256,17 +254,14 @@ function createSequenceControls(attributes){
     // Make range slider value equal the new index value
     $('.range-slider').val(index);
   });
-
 // Event listener for the range slider,
 // which keeps track of the value of the slider and reassigns it
   $('.range-slider').on('input', function(){
     var index = $(this).val();
-    console.log(index);
-    console.log(attributes);
-    console.log(attributes[index]);
     updatePropSymbols(attributes[index]);
   });
 };
+
 
 // Add proportional symbols to the map after specifying their attributes
 function createPropSymbols(data, attributes){
@@ -298,11 +293,11 @@ function createPropSymbols(data, attributes){
     // symColors = SymbolColors(Number(feature.properties),attribute);
 
     // Use hue to differentiate between increase and decrease in rural population
-    // if (attValue < 0){
-    //   options.fillColor = "#d8b365"
-    // } else {
-    //   options.fillColor = "#5ab4ac"
-    // };
+    if (attValue < 0){
+      options.fillColor = "#d8b365"
+    } else {
+      options.fillColor = "#5ab4ac"
+    };
 
     // Use absolute value to create symbols with negative values
     options.radius = calcPropRadius(Math.abs(attValue));
@@ -316,7 +311,7 @@ function createPropSymbols(data, attributes){
     // Create popup content with consolidated code
     var popupContent = createPopupContent (feature.properties, attribute);
 
-    return SymbolColors(layer, properties, attribute);
+    // return SymbolColors(layer, properties, attribute);
 
     //Bind the popup to the circle marker and create an offset
     layer.bindPopup(popupContent, {
