@@ -10,6 +10,7 @@
 // Map variable declared globally.
 var leafletMap;
 
+
 // Define variable globally to hold data
 var attributes = ["2008","2009","2010","2011","2012","2013","2014","2015","2016","2017","2018"];
 
@@ -22,7 +23,6 @@ function createMap(){
     center: [-10,-70],
     zoom: 3,
   });
-
   // Set maximum and minimum zoom to maintain national scale
   leafletMap.options.maxZoom = 7;
   leafletMap.options.minZoom = 2;
@@ -75,10 +75,8 @@ function calcPropRadius(attValue) {
 };
 
 
-// function SymbolColors(properties, attribute){
-//   this.properties = properties;
-//   this.attribute = attribute;
-//   if (properties[attribute] < 0){
+// function SymbolColors(layer, properties){
+//   if (properties[attributes] < 0){
 //     layer.setStyle({fillColor:"#d8b365"});
 //   } else {
 //     layer.setStyle({fillColor:"5ab4ac"});
@@ -119,7 +117,8 @@ function processData(data){
 };
 
 // Create legend, which has temporal component and attribute component
-function createLegend(leafletMap, attributes){
+function createLegend(){
+      
   var LegendControl = L.Control.extend({
     options: {
       position: 'bottomright'
@@ -130,7 +129,8 @@ function createLegend(leafletMap, attributes){
       // Styles specified using 'legend-control-container'
       var container = L.DomUtil.create('div', 'legend-control-container');
 
-      $(container).append('<div id="temporal-legend">Rural Pop. Growth in</div>');
+//        Use span so that year can be specifically targeted by jQuery
+      $(container).append('<div id="temporal-legend">Rural Pop. Growth in <span id="year">2008</span></div>');
 
       return container;
     }
@@ -143,7 +143,6 @@ function createLegend(leafletMap, attributes){
     index++;
     // Make value go around if an end is surpassed
     index = index > 10 ? 0 : index;
-    // createLegend(leafletMap, attributes[index]);
     // Conditional statemnt for when reverse button is pressed
   } else if ($(this).attr('id') == 'reverse'){
     // Decrement
@@ -151,15 +150,16 @@ function createLegend(leafletMap, attributes){
     index = index < 0 ? 10 : index;
     // // Make proportional symbols reflect
     // // the current value from the attributes array
-    // createLegend(leafletMap, attributes[index]);
   };
 
 
 };
 
 
-function updateLegend(leafletMap, attributes){
-
+function updateLegend(attribute){
+//Target year element with jQuery and update with attribute 
+    
+    $("span#year").text(attribute);
 }
 
 function updatePropSymbols(attribute){
@@ -179,7 +179,6 @@ function updatePropSymbols(attribute){
       else {
         layer.setStyle({fillColor:"#5ab4ac"});
       };
-
 
       layer.setRadius(radius);
 
@@ -213,8 +212,8 @@ function createSequenceControls(attributes){
       $(container).append('<button class="step" id="reverse">Backward</button>');
       $(container).append('<button class="step" id="forward">Forward</button>');
       // Replace step buttons with images
-      $('#reverse').html('<img src="img/StepBackward.png">');
-      $('#forward').html('<img src="img/StepForward.png">');
+      $("button#reverse").html('<img src="img/StepBackward.png">');
+      $("button#forward").html('<img src="img/StepForward.png">');
       // Step buttons created by Dmitriy Ivanov from Noun Project
 
       // Disable mouse event listeners within container so that clicks
@@ -244,8 +243,10 @@ function createSequenceControls(attributes){
       index++;
       // Make value go around if an end is surpassed
       index = index > 10 ? 0 : index;
-      updatePropSymbols(attributes[index]);
-      // createLegend(leafletMap, attributes[index]);
+
+        
+      
+
       // Conditional statemnt for when reverse button is pressed
     } else if ($(this).attr('id') == 'reverse'){
       // Decrement
@@ -253,9 +254,12 @@ function createSequenceControls(attributes){
       index = index < 0 ? 10 : index;
       // // Make proportional symbols reflect
       // // the current value from the attributes array
-      updatePropSymbols(attributes[index]);
-      // createLegend(leafletMap, attributes[index]);
+
     };
+//      Update the symbols and legend with each step button click
+       updatePropSymbols(attributes[index]);
+    
+      updateLegend(attributes[index]);
 
     // Make proportional symbols reflect
     // the current value from the attributes array
@@ -268,6 +272,7 @@ function createSequenceControls(attributes){
   $('.range-slider').on('input', function(){
     var index = $(this).val();
     updatePropSymbols(attributes[index]);
+       updateLegend(attributes[index]);
   });
 };
 
@@ -355,7 +360,7 @@ function onEachFeature(feature, layer) {
 };
 
 // Use AJAX for asynchronous data and page loading
-function getData(leafletMap){
+function getData(){
     //load the data
     $.ajax("data/RuralPop.geojson", {
         dataType: "json",
@@ -365,6 +370,8 @@ function getData(leafletMap){
             //add symbols and UI elements
             createPropSymbols(response, attributes);
             createSequenceControls(attributes);
+            createLegend();
+            
 
         }
     });
