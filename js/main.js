@@ -23,8 +23,9 @@ function createMap(){
     zoom: 3,
   });
 
-  // Set maximum zoom to maintain national scale
+  // Set maximum and minimum zoom to maintain national scale
   leafletMap.options.maxZoom = 7;
+  leafletMap.options.minZoom = 2;
 
   // Add OSM tile layer, will change basemap later
   L.tileLayer('https://api.mapbox.com/styles/v1/cjarchuleta/ck7cvqmln0kc41jmlm4ngou7n/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1IjoiY2phcmNodWxldGEiLCJhIjoiY2syYW9pcTAyMWV5ejNtbzZhM25zNnpsdSJ9.7Gl9zzKB40HnoFIWBW-Tvg'
@@ -117,6 +118,50 @@ function processData(data){
   return attributes;
 };
 
+// Create legend, which has temporal component and attribute component
+function createLegend(leafletMap, attributes){
+  var LegendControl = L.Control.extend({
+    options: {
+      position: 'bottomright'
+    },
+
+    onAdd: function (leafletMap) {
+      // Create a container div to put the legend in
+      // Styles specified using 'legend-control-container'
+      var container = L.DomUtil.create('div', 'legend-control-container');
+
+      $(container).append('<div id="temporal-legend">Rural Pop. Growth in</div>');
+
+      return container;
+    }
+  });
+
+  leafletMap.addControl(new LegendControl());
+
+  if ($(this).attr('id') == 'forward'){
+    // Increment
+    index++;
+    // Make value go around if an end is surpassed
+    index = index > 10 ? 0 : index;
+    // createLegend(leafletMap, attributes[index]);
+    // Conditional statemnt for when reverse button is pressed
+  } else if ($(this).attr('id') == 'reverse'){
+    // Decrement
+    index--;
+    index = index < 0 ? 10 : index;
+    // // Make proportional symbols reflect
+    // // the current value from the attributes array
+    // createLegend(leafletMap, attributes[index]);
+  };
+
+
+};
+
+
+function updateLegend(leafletMap, attributes){
+
+}
+
 function updatePropSymbols(attribute){
   leafletMap.eachLayer(function(layer){
     // Only execute following code on the percent change in rural population
@@ -141,48 +186,7 @@ function updatePropSymbols(attribute){
       // Use consolidated popup content code
       var popupContent = createPopupContent(props, attribute);
 
-      // Create legend, which has temporal component and attribute component
-      function createLegend(leafletMap, attributes){
-        var LegendControl = L.Control.extend({
-          options: {
-            position: 'bottomright'
-          },
 
-          onAdd: function (leafletMap) {
-            // Create a container div to put the legend in
-            // Styles specified using 'legend-control-container'
-            var container = L.DomUtil.create('div', 'legend-control-container');
-
-            var legendIndex = $('.range-slider').val();
-
-            $(container).append('<div id="temporal-legend">Rural Pop. Growth in</div>');
-
-            return container;
-          }
-        });
-
-        leafletMap.addControl(new LegendControl());
-
-        if ($(this).attr('id') == 'forward'){
-          // Increment
-          legendIndex++;
-          // Make value go around if an end is surpassed
-          legendIndex = legendIndex > 10 ? 0 : legendIndex;
-          createLegend(leafletMap, attributes[legendIndex]);
-          // Conditional statemnt for when reverse button is pressed
-        } else if ($(this).attr('id') == 'reverse'){
-          // Decrement
-          legendIndex--;
-          legendIndex = legendIndex < 0 ? 10 : legendIndex;
-          // // Make proportional symbols reflect
-          // // the current value from the attributes array
-          createLegend(leafletMap, attributes[legendIndex]);
-        };
-
-
-      };
-
-      createLegend(leafletMap, attributes[legendIndex]);
       //update popup content
       popup = layer.getPopup();
       popup.setContent(popupContent).update();
@@ -241,6 +245,7 @@ function createSequenceControls(attributes){
       // Make value go around if an end is surpassed
       index = index > 10 ? 0 : index;
       updatePropSymbols(attributes[index]);
+      // createLegend(leafletMap, attributes[index]);
       // Conditional statemnt for when reverse button is pressed
     } else if ($(this).attr('id') == 'reverse'){
       // Decrement
@@ -249,6 +254,7 @@ function createSequenceControls(attributes){
       // // Make proportional symbols reflect
       // // the current value from the attributes array
       updatePropSymbols(attributes[index]);
+      // createLegend(leafletMap, attributes[index]);
     };
 
     // Make proportional symbols reflect
@@ -275,7 +281,6 @@ function createPropSymbols(data, attributes){
     //Choose attribute to visulaize with proportional symbols
     // Choose intial value for map and slider
     var attribute = attributes[0];
-    console.log(attribute);
 
     //Create marker options
     var options = {
@@ -320,6 +325,7 @@ function createPropSymbols(data, attributes){
     layer.bindPopup(popupContent, {
       offset: new L.Point(0,-options.radius * 0.5)
     });
+
 
     //Return the circle marker to the L.geoJson pointToLayer option
     return layer;
