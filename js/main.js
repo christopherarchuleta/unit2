@@ -1,26 +1,11 @@
 // Creating map for leaflet lab
 
-// Steps for retrieve operator
-//Step 4. Determine the attribute for scaling the proportional symbols GOOD
-//Step 5. For each feature, determine its value for the selected attribute GOOD
-//Step 6. Give each feature's circle marker a radius based on its attribute value GOOD
+// Steps for attribute legend
+// Step 1. Add an `<svg>` element to the legend container
+// Step 2. Add a `<circle>` element for each of three attribute values: min, max, and mean
+// Step 3. Assign each `<circle>` element a center and radius based on the dataset min, max, and mean values of all attributes
+// Step 4. Create legend text to label each circle
 
-// Steps for sequence operator
-//GOAL: Allow the user to sequence through the attributes and resymbolize the map
-//   according to each attribute
-//STEPS:
-//Step 1. Create slider widget GOOD
-//Step 2. Create step buttons GOOD
-//Step 3. Create an array of the sequential attributes to keep track of their order GOOD
-//Step 4. Assign the current attribute based on the index of the attributes array GOOD
-//Step 5. Listen for user input via affordances GOOD
-//Step 6. For a forward step through the sequence, increment the attributes array index;
-//   for a reverse step, decrement the attributes array index GOOD
-//Step 7. At either end of the sequence, return to the opposite end of the sequence on the next step
-//   (wrap around) GOOD
-//Step 8. Update the slider position based on the new index GOOD
-//Step 9. Reassign the current attribute based on the new attributes array index
-//Step 10. Resize proportional symbols according to each feature's value for the new attribute
 
 // Map variable declared globally.
 var leafletMap;
@@ -152,23 +137,25 @@ function updatePropSymbols(attribute){
 
 
       layer.setRadius(radius);
-      console.log(attribute);
-      console.log(props[String("Country Name")] + attribute + typeof(radius) + radius);
 
       // Use consolidated popup content code
       var popupContent = createPopupContent(props, attribute);
 
-
-      function createLegend(attributes){
+      // Create legend, which has temporal component and attribute component
+      function createLegend(leafletMap, attributes){
         var LegendControl = L.Control.extend({
           options: {
             position: 'bottomright'
           },
 
-          onAdd: function () {
+          onAdd: function (leafletMap) {
+            // Create a container div to put the legend in
+            // Styles specified using 'legend-control-container'
             var container = L.DomUtil.create('div', 'legend-control-container');
 
-            $(container).append('<button id="legend">Rural</button>');
+            var legendIndex = $('.range-slider').val();
+
+            $(container).append('<div id="temporal-legend">Rural Pop. Growth in</div>');
 
             return container;
           }
@@ -176,14 +163,30 @@ function updatePropSymbols(attribute){
 
         leafletMap.addControl(new LegendControl());
 
+        if ($(this).attr('id') == 'forward'){
+          // Increment
+          legendIndex++;
+          // Make value go around if an end is surpassed
+          legendIndex = legendIndex > 10 ? 0 : legendIndex;
+          createLegend(leafletMap, attributes[legendIndex]);
+          // Conditional statemnt for when reverse button is pressed
+        } else if ($(this).attr('id') == 'reverse'){
+          // Decrement
+          legendIndex--;
+          legendIndex = legendIndex < 0 ? 10 : legendIndex;
+          // // Make proportional symbols reflect
+          // // the current value from the attributes array
+          createLegend(leafletMap, attributes[legendIndex]);
+        };
+
 
       };
 
-
+      createLegend(leafletMap, attributes[legendIndex]);
       //update popup content
       popup = layer.getPopup();
       popup.setContent(popupContent).update();
-      createLegend(attributes).update();
+
       };
     });
 };

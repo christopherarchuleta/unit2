@@ -14,11 +14,13 @@
   margin: 5px 10px;
   line-height: 0.7;
   background-color: #fff7bc;
+  opacity: 0.9;
 }
 
 .leaflet-popup-content-wrapper,
 .leaflet-popup-tip {
   background-color: #fff7bc;
+  opacity: 0.9;
 }
 
 /*Make popup appear near symbol*/
