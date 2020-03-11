@@ -54,7 +54,7 @@
 }
 
 .sequence-control-container {
-  width: 350px;
+  width: 300px;
   height: 30px;
   background-color: rgba(245,255,250,0.9);
   padding: 10px;
@@ -63,17 +63,22 @@
   border: solid gray 1px;
 }
 
+#attribute-legend {
+}
+
 .legend-control-container {
-  width: 100px;
-  height: 150px;
+  width: 150px;
+  height: 180px;
   background-color: rgba(245,255,250,0.9);
-  padding: 10px;
+  font-family: "Palatino Linotype","Book Antiqua",Palatino,serif;
+  font-size: 10pt;
+  font-weight: bold;
   text-align: center;
   border: solid gray 1px;
 }
 
 .range-slider {
-  width: 250px;
+  width: 200px;
 }
 
 .step {

@@ -1,8 +1,6 @@
 // Creating map for leaflet lab
 
 // Steps for attribute legend
-// Step 1. Add an `<svg>` element to the legend container
-// Step 2. Add a `<circle>` element for each of three attribute values: min, max, and mean
 // Step 3. Assign each `<circle>` element a center and radius based on the dataset min, max, and mean values of all attributes
 // Step 4. Create legend text to label each circle
 
@@ -10,12 +8,12 @@
 // Map variable declared globally.
 var leafletMap;
 
+// Globally declared variable with min, max, and mean
+var dataStats = {};
 
 // Define variable globally to hold data
 var attributes = ["2008","2009","2010","2011","2012","2013","2014","2015","2016","2017","2018"];
 
-// Minimum value, used for the Flannery ratio, will be put into this global variable
-var minValue;
 
 // Instantiate map, defining the initial viewpoint
 function createMap(){
@@ -28,7 +26,7 @@ function createMap(){
   leafletMap.options.minZoom = 2;
 
   // Add OSM tile layer, will change basemap later
-  L.tileLayer('https://api.mapbox.com/styles/v1/cjarchuleta/ck7cvqmln0kc41jmlm4ngou7n/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1IjoiY2phcmNodWxldGEiLCJhIjoiY2syYW9pcTAyMWV5ejNtbzZhM25zNnpsdSJ9.7Gl9zzKB40HnoFIWBW-Tvg'
+  L.tileLayer('https://api.mapbox.com/styles/v1/cjarchuleta/ck7mofxyh07e91iqvblhjbemz/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1IjoiY2phcmNodWxldGEiLCJhIjoiY2syYW9pcTAyMWV5ejNtbzZhM25zNnpsdSJ9.7Gl9zzKB40HnoFIWBW-Tvg'
         // attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>',
         // id: 'mapbox/streets-v11',
         // accessToken: 'pk.eyJ1IjoiY2phcmNodWxldGEiLCJhIjoiY2syYW9pcTAyMWV5ejNtbzZhM25zNnpsdSJ9.7Gl9zzKB40HnoFIWBW-Tvg'
@@ -40,8 +38,10 @@ function createMap(){
 };
 
 
-// Calculate minimum value within the dataset to use the Flannery ratio
-function calcMinValue(data){
+// Calculate the mean value, the minimum absolute value,
+// and the maximum absolute value within the dataset
+//  to use the Flannery ratio
+function calcStats(data){
 
   // Create empty array to hold data
   var allValues = [];
@@ -58,9 +58,15 @@ function calcMinValue(data){
   }
 
   // Use the Math.min function to calculate minimum value in the array
-  var minValue = Math.min(...allValues)
+  dataStats.min = Math.min(...allValues);
+  // Repeat above process, but for the maximum value
+  dataStats.max = Math.max(...allValues);
 
-  return minValue;
+  // Calculate the mean (sum/n)
+  var sum = allValues.reduce(function(a, b){return a+b});
+  dataStats.mean = sum/ allValues.length;
+
+
 };
 
 function calcPropRadius(attValue) {
@@ -69,7 +75,7 @@ function calcPropRadius(attValue) {
   var minRadius = 1.3;
 
   // Flannery scaling ratio
-  var radius = 1.0083 * Math.pow(attValue/minValue,0.5715) * minRadius
+  var radius = 1.0083 * Math.pow(attValue/dataStats.min,0.5715) * minRadius
 
   return radius;
 };
@@ -118,7 +124,7 @@ function processData(data){
 
 // Create legend, which has temporal component and attribute component
 function createLegend(){
-      
+
   var LegendControl = L.Control.extend({
     options: {
       position: 'bottomright'
@@ -129,8 +135,31 @@ function createLegend(){
       // Styles specified using 'legend-control-container'
       var container = L.DomUtil.create('div', 'legend-control-container');
 
-//        Use span so that year can be specifically targeted by jQuery
-      $(container).append('<div id="temporal-legend">Rural Pop. Growth in <span id="year">2008</span></div>');
+//    Use span so that year can be specifically targeted by jQuery
+      $(container).append('<div id="temporal-legend">Percent Rural Pop. Growth in <span id="year">2008</span></div>');
+
+      // Attribute legend is an svg string because symbols are vectors
+      var svg = '<svg id="attribute-legend" width="130px" height="130px">';
+
+
+      // Create array for exemplar symbols in attribute legend
+      var circles = ["max", "mean", "min"];
+      // Add the three circles to the svg variable
+      for (var i=0; i<circles.length; i++){
+
+        // Set the radii and vertical placement of the circles
+        var circleRadius = calcPropRadius(dataStats[circles[i]]);
+        var cy = 130 - circleRadius;
+
+
+        svg += '<circle class="legend-circle" id="' + circles[i] + '" r="' + circleRadius + '"cy="' + cy + '" fill="#ffffff" fill-opacity="0.9" stroke="#000000" cx="65"/>';
+      };
+      // Close the svg string
+      svg += "</svg>";
+
+
+      // Use jQuery to target the container and add the svg variable to it
+      $(container).append(svg);
 
       return container;
     }
@@ -157,8 +186,8 @@ function createLegend(){
 
 
 function updateLegend(attribute){
-//Target year element with jQuery and update with attribute 
-    
+//Target year element with jQuery and update with attribute
+
     $("span#year").text(attribute);
 }
 
@@ -244,8 +273,8 @@ function createSequenceControls(attributes){
       // Make value go around if an end is surpassed
       index = index > 10 ? 0 : index;
 
-        
-      
+
+
 
       // Conditional statemnt for when reverse button is pressed
     } else if ($(this).attr('id') == 'reverse'){
@@ -258,7 +287,7 @@ function createSequenceControls(attributes){
     };
 //      Update the symbols and legend with each step button click
        updatePropSymbols(attributes[index]);
-    
+
       updateLegend(attributes[index]);
 
     // Make proportional symbols reflect
@@ -366,12 +395,13 @@ function getData(){
         dataType: "json",
         success: function(response){
             var attributes = processData(response);
-            minValue = calcMinValue(response);
+            minValue = calcStats(response);
             //add symbols and UI elements
             createPropSymbols(response, attributes);
             createSequenceControls(attributes);
             createLegend();
-            
+            calcStats(response);
+
 
         }
     });
