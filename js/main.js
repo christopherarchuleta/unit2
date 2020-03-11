@@ -157,14 +157,14 @@ function createLegend(){
       var textY = i * 28 + 31;
 
       // Add labels to svg
-      svg += '<text id="' + circles[i] + '-text" x="90" y="' + textY + '">' + Math.round(dataStats[circles[i]]*100)/100 + '</text>';
+      svg += '<text id="' + circles[i] + '-text" x="87" y="' + textY + '">' + Math.round(dataStats[circles[i]]*100)/100 + '</text>';
 
       // Add colored circles to legend for positive and negative values
-      svg +='<circle class="legend-circle" id="Positive" r="5px"cy="20px" fill="#5ab4ac" fill-opacity="1.0" cx="145px"/>';
-      svg +='<circle class="legend-circle" id="Negative" r="5px"cy="70px" fill="#d8b365" fill-opacity="1.0" cx="145px"/>';
+      svg +='<circle class="legend-circle" id="Positive" r="5px"cy="20px" fill="#5ab4ac" fill-opacity="1.0" cx="150px"/>';
+      svg +='<circle class="legend-circle" id="Negative" r="5px"cy="70px" fill="#d8b365" fill-opacity="1.0" cx="150px"/>';
       // Add labels to colored circles in attribute legend
-      svg +='<text id="Pos" x="120" y="40">Positive</text>';
-      svg +='<text id="Neg" x="120" y="90">Negative</text>';
+      svg +='<text id="Pos" x="125" y="40">Positive</text>';
+      svg +='<text id="Neg" x="125" y="90">Negative</text>';
     };
 
       // Close the svg string
@@ -253,10 +253,7 @@ function createSequenceControls(attributes){
       // Add step buttons
       $(container).append('<button class="step" id="reverse">Backward</button>');
       $(container).append('<button class="step" id="forward">Forward</button>');
-      // Replace step buttons with images
-      $("button#reverse").html('<img src="img/StepBackward.png">');
-      $("button#forward").html('<img src="img/StepForward.png">');
-      // Step buttons created by Dmitriy Ivanov from Noun Project
+
 
       // Disable mouse event listeners within container so that clicks
       // only affect sequnce controls
@@ -268,6 +265,12 @@ function createSequenceControls(attributes){
   });
 
   leafletMap.addControl(new SequenceControl());
+
+  // Replace step buttons with images
+  $("button#reverse").html('<img src="img/StepBackward.png">');
+  $("button#forward").html('<img src="img/StepForward.png">');
+  // Step buttons created by Dmitriy Ivanov from Noun Project
+
 
   $('.range-slider').attr({
     max: 10,
