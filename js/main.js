@@ -1,7 +1,6 @@
 // Creating map for leaflet lab
 
 // Steps for attribute legend
-// Step 3. Assign each `<circle>` element a center and radius based on the dataset min, max, and mean values of all attributes
 // Step 4. Create legend text to label each circle
 
 
@@ -139,7 +138,7 @@ function createLegend(){
       $(container).append('<div id="temporal-legend">Percent Rural Pop. Growth in <span id="year">2008</span></div>');
 
       // Attribute legend is an svg string because symbols are vectors
-      var svg = '<svg id="attribute-legend" width="130px" height="130px">';
+      var svg = '<svg id="attribute-legend" width="180px" height="95px">';
 
 
       // Create array for exemplar symbols in attribute legend
@@ -149,11 +148,25 @@ function createLegend(){
 
         // Set the radii and vertical placement of the circles
         var circleRadius = calcPropRadius(dataStats[circles[i]]);
-        var cy = 130 - circleRadius;
+        var cy = 90 - circleRadius;
 
 
-        svg += '<circle class="legend-circle" id="' + circles[i] + '" r="' + circleRadius + '"cy="' + cy + '" fill="#ffffff" fill-opacity="0.9" stroke="#000000" cx="65"/>';
-      };
+        svg += '<circle class="legend-circle" id="' + circles[i] + '" r="' + circleRadius + '"cy="' + cy + '" fill="#ffffff" fill-opacity="0.9" stroke="#000000" cx="45px"/>';
+
+      // Evenly space out labels
+      var textY = i * 28 + 31;
+
+      // Add labels to svg
+      svg += '<text id="' + circles[i] + '-text" x="90" y="' + textY + '">' + Math.round(dataStats[circles[i]]*100)/100 + '</text>';
+
+      // Add colored circles to legend for positive and negative values
+      svg +='<circle class="legend-circle" id="Positive" r="5px"cy="20px" fill="#5ab4ac" fill-opacity="1.0" cx="145px"/>';
+      svg +='<circle class="legend-circle" id="Negative" r="5px"cy="70px" fill="#d8b365" fill-opacity="1.0" cx="145px"/>';
+      // Add labels to colored circles in attribute legend
+      svg +='<text id="Pos" x="120" y="40">Positive</text>';
+      svg +='<text id="Neg" x="120" y="90">Negative</text>';
+    };
+
       // Close the svg string
       svg += "</svg>";
 
