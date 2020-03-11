@@ -1,7 +1,6 @@
 // Creating map for leaflet lab
 
-// Steps for attribute legend
-// Step 4. Create legend text to label each circle
+
 
 
 // Map variable declared globally.
